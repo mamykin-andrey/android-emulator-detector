@@ -1,13 +1,18 @@
 package ru.mamykin.emulatordetector
 
+import androidx.annotation.AnyThread
+
 interface EmulatorDetector {
 
-    suspend fun getProbability(): EmulatorProbability
+    suspend fun checkDevice(): DeviceState
 
-    fun getProbabilityCompat(listener: ProbabilityCalculatedListener): EmulatorProbability
+    @AnyThread
+    fun checkDeviceCompat(listener: DeviceCheckedListener): DeviceState
 
-    interface ProbabilityCalculatedListener {
+    fun cancelCheck()
 
-        fun onProbabilityCalculated(probability: EmulatorProbability)
+    interface DeviceCheckedListener {
+
+        fun onDeviceChecked(probability: DeviceState)
     }
 }
