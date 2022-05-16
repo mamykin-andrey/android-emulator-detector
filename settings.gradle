@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "AndroidEmulatorDetector"
-include ':app'
+include ':sample'
