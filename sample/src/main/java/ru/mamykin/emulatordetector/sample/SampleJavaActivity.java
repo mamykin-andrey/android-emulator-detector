@@ -6,7 +6,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import ru.mamykin.emulatordetector.CombinedEmulatorDetector;
+import ru.mamykin.emulatordetector.ComplexEmulatorDetector;
 import ru.mamykin.emulatordetector.DeviceState;
 import ru.mamykin.emulatordetector.EmulatorDetector;
 
@@ -17,7 +17,7 @@ public class SampleJavaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        EmulatorDetector emulatorDetector = new CombinedEmulatorDetector.Builder(this)
+        EmulatorDetector emulatorDetector = new ComplexEmulatorDetector.Builder(this)
             .checkSensors()
             .checkProperties()
             .build();
