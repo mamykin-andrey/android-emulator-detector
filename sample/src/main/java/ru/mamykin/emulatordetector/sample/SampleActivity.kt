@@ -9,24 +9,16 @@ import ru.mamykin.emulatordetector.EmulatorDetector
 
 class SampleActivity : AppCompatActivity() {
 
-    private val emulatorDetector: EmulatorDetector by lazy {
-        CombinedEmulatorDetector(this)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val tvVerdict: TextView = findViewById(R.id.tv_device_verdict)
-        emulatorDetector.checkDeviceCompat(object : EmulatorDetector.DeviceCheckedListener {
-            override fun onDeviceChecked(probability: DeviceState) {
-                tvVerdict.text = convertToDeviceVerdict(probability)
-            }
-        })
-    }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        emulatorDetector.cancelCheck()
+        val tvVerdict: TextView = findViewById(R.id.tv_device_verdict)
+        val emulatorDetector: EmulatorDetector = CombinedEmulatorDetector.Builder(this)
+            .checkSensors()
+            .checkProperties()
+            .build()
+        tvVerdict.text = convertToDeviceVerdict(emulatorDetector.getState())
     }
 
     private fun convertToDeviceVerdict(probability: DeviceState): String {

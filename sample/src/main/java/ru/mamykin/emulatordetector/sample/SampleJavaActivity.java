@@ -7,21 +7,22 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import ru.mamykin.emulatordetector.CombinedEmulatorDetector;
-import ru.mamykin.emulatordetector.EmulatorDetector;
 import ru.mamykin.emulatordetector.DeviceState;
+import ru.mamykin.emulatordetector.EmulatorDetector;
 
-public class SampleCompatActivity extends AppCompatActivity {
-
-    @NonNull
-    private EmulatorDetector emulatorDetector;
+public class SampleJavaActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        emulatorDetector = new CombinedEmulatorDetector(this);
         setContentView(R.layout.activity_main);
+
+        EmulatorDetector emulatorDetector = new CombinedEmulatorDetector.Builder(this)
+            .checkSensors()
+            .checkProperties()
+            .build();
         TextView tvVerdict = findViewById(R.id.tv_device_verdict);
-        emulatorDetector.checkDeviceCompat(probability -> tvVerdict.setText(convertToDeviceVerdict(probability)));
+        tvVerdict.setText(convertToDeviceVerdict(emulatorDetector.getState()));
     }
 
     @NonNull
@@ -42,11 +43,5 @@ public class SampleCompatActivity extends AppCompatActivity {
             }
         }
         return getString(verdictTitle);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        emulatorDetector.cancelCheck();
     }
 }
