@@ -10,21 +10,23 @@ internal class SensorEventProducer(
     private val context: Context,
     private val sensorType: Int
 ) {
-    private val sensorManager by lazy { context.getSystemService(Context.SENSOR_SERVICE) as SensorManager? }
-    private var listener: SensorEventListener? = null
-
     @Throws(NoSuchSensorException::class)
-    fun getSensorEvents(onEvent: (SensorEvent) -> Unit) {
+    fun getSensorEvents(eventsCount: Int, onEvents: (List<FloatArray>) -> Unit) {
+        val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager?
         val sensor = sensorManager?.getDefaultSensor(sensorType) ?: throw NoSuchSensorException()
+        val events = mutableListOf<FloatArray>()
 
-        listener = object : SensorEventListener {
-            override fun onSensorChanged(sensorEvent: SensorEvent) = onEvent(sensorEvent)
+        val eventListener = object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent) {
+                events.add(event.values.copyOf())
+                if (events.size == eventsCount) {
+                    sensorManager.unregisterListener(this)
+                    onEvents(events)
+                }
+            }
+
             override fun onAccuracyChanged(sensor: Sensor, i: Int) = Unit
         }
-        sensorManager!!.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_NORMAL)
-    }
-
-    fun stop() {
-        sensorManager!!.unregisterListener(requireNotNull(listener))
+        sensorManager.registerListener(eventListener, sensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
 }

@@ -34,15 +34,15 @@ public class SampleJavaActivity extends AppCompatActivity {
         int verdictTitle = 0;
         switch (probability) {
             case EMULATOR: {
-                verdictTitle = R.string.emulator_most_likely_title;
+                verdictTitle = R.string.verdict_emulator;
                 break;
             }
             case MAYBE_EMULATOR: {
-                verdictTitle = R.string.emulator_maybe_title;
+                verdictTitle = R.string.verdict_maybe_emulator;
                 break;
             }
             case NOT_EMULATOR: {
-                verdictTitle = R.string.emulator_unlikely_title;
+                verdictTitle = R.string.verdict_not_emulator;
                 break;
             }
         }

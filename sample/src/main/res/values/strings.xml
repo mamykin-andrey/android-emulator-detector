@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">AndroidEmulatorDetectorSample</string>
-    <string name="emulator_most_likely_title">This device is most likely an emulator</string>
-    <string name="emulator_maybe_title">This device is maybe an emulator</string>
-    <string name="emulator_unlikely_title">This device is unlikely an emulator</string>
+    <string name="verdict_progress_title">Checking...</string>
+    <string name="verdict_emulator">This device is an emulator</string>
+    <string name="verdict_maybe_emulator">This device is maybe an emulator</string>
+    <string name="verdict_not_emulator">This device is not an emulator</string>
 </resources>

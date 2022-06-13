@@ -26,9 +26,9 @@ class SampleActivity : AppCompatActivity() {
 
     private fun convertToDeviceVerdict(probability: DeviceState): String {
         val verdictTitle = when (probability) {
-            DeviceState.EMULATOR -> R.string.emulator_most_likely_title
-            DeviceState.MAYBE_EMULATOR -> R.string.emulator_maybe_title
-            DeviceState.NOT_EMULATOR -> R.string.emulator_unlikely_title
+            DeviceState.EMULATOR -> R.string.verdict_emulator
+            DeviceState.MAYBE_EMULATOR -> R.string.verdict_maybe_emulator
+            DeviceState.NOT_EMULATOR -> R.string.verdict_not_emulator
         }
         return getString(verdictTitle)
     }
