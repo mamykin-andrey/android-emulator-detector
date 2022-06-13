@@ -2,5 +2,5 @@ package ru.mamykin.emulatordetector
 
 interface EmulatorDetector {
 
-    fun getState(): DeviceState
+    fun getState(onState: (DeviceState) -> Unit)
 }

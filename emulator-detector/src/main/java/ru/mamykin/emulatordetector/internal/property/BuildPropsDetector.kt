@@ -1,10 +1,10 @@
 package ru.mamykin.emulatordetector.internal.property
 
 import android.os.Build
+import ru.mamykin.emulatordetector.BlockingEmulatorDetector
 import ru.mamykin.emulatordetector.DeviceState
-import ru.mamykin.emulatordetector.EmulatorDetector
 
-internal class BuildPropsDetector : EmulatorDetector {
+internal class BuildPropsDetector : BlockingEmulatorDetector {
 
     private val checkFunctions = listOf(
         ::isEmulatorFingerprint,

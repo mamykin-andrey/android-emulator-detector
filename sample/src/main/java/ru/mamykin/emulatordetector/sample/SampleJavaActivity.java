@@ -15,14 +15,18 @@ public class SampleJavaActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_sample);
 
+        TextView tvVerdict = findViewById(R.id.tv_device_verdict);
         EmulatorDetector emulatorDetector = new ComplexEmulatorDetector.Builder(this)
             .checkSensors()
             .checkProperties()
             .build();
-        TextView tvVerdict = findViewById(R.id.tv_device_verdict);
-        tvVerdict.setText(convertToDeviceVerdict(emulatorDetector.getState()));
+
+        emulatorDetector.getState(deviceState -> {
+            tvVerdict.setText(convertToDeviceVerdict(deviceState));
+            return null;
+        });
     }
 
     @NonNull

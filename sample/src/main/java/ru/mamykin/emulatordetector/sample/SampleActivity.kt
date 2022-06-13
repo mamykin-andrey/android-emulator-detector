@@ -11,14 +11,17 @@ class SampleActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_sample)
 
         val tvVerdict: TextView = findViewById(R.id.tv_device_verdict)
         val emulatorDetector: EmulatorDetector = ComplexEmulatorDetector.Builder(this)
             .checkSensors()
             .checkProperties()
             .build()
-        tvVerdict.text = convertToDeviceVerdict(emulatorDetector.getState())
+
+        emulatorDetector.getState {
+            tvVerdict.text = convertToDeviceVerdict(it)
+        }
     }
 
     private fun convertToDeviceVerdict(probability: DeviceState): String {

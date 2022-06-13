@@ -4,12 +4,11 @@ import android.content.Context
 import ru.mamykin.emulatordetector.internal.property.PropertiesEmulatorDetector
 
 class ComplexEmulatorDetector private constructor(
-    private val context: Context,
     private val detectors: Collection<EmulatorDetector>,
 ) : EmulatorDetector {
 
-    override fun getState(): DeviceState {
-        return detectors.map { it.getState() }.first()
+    override fun getState(onState: (DeviceState) -> Unit) {
+        detectors.first().getState(onState)
     }
 
     class Builder(
@@ -18,13 +17,12 @@ class ComplexEmulatorDetector private constructor(
         private val emulators = mutableListOf<EmulatorDetector>()
 
         fun checkSensors() = this.apply {
-//            emulators.add(PropertiesEmulatorDetector())
         }
 
         fun checkProperties() = this.apply {
-            emulators.add(PropertiesEmulatorDetector(context))
+            emulators.add(PropertiesEmulatorDetector())
         }
 
-        fun build(): EmulatorDetector = ComplexEmulatorDetector(context, emulators)
+        fun build(): EmulatorDetector = ComplexEmulatorDetector(emulators)
     }
 }
