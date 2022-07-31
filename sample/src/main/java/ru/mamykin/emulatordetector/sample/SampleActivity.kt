@@ -2,6 +2,7 @@ package ru.mamykin.emulatordetector.sample
 
 import android.os.Bundle
 import android.widget.TextView
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import ru.mamykin.emulatordetector.ComplexEmulatorDetector
 import ru.mamykin.emulatordetector.DeviceState
@@ -19,17 +20,17 @@ class SampleActivity : AppCompatActivity() {
             .checkProperties()
             .build()
 
-        emulatorDetector.getState {
+        emulatorDetector.check {
             tvVerdict.text = convertToDeviceVerdict(it)
         }
     }
 
-    private fun convertToDeviceVerdict(probability: DeviceState): String {
-        val verdictTitle = when (probability) {
-            DeviceState.EMULATOR -> R.string.verdict_emulator
-            DeviceState.MAYBE_EMULATOR -> R.string.verdict_maybe_emulator
-            DeviceState.NOT_EMULATOR -> R.string.verdict_not_emulator
+    private fun convertToDeviceVerdict(state: DeviceState): String {
+        @StringRes val verdictRes = when (state) {
+            is DeviceState.Emulator -> R.string.verdict_emulator
+            is DeviceState.MaybeEmulator -> R.string.verdict_maybe_emulator
+            else -> R.string.verdict_not_emulator
         }
-        return getString(verdictTitle)
+        return getString(verdictRes)
     }
 }

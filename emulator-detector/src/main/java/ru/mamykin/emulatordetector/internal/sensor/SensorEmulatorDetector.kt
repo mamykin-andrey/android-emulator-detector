@@ -3,6 +3,7 @@ package ru.mamykin.emulatordetector.internal.sensor
 import android.content.Context
 import ru.mamykin.emulatordetector.DeviceState
 import ru.mamykin.emulatordetector.EmulatorDetector
+import ru.mamykin.emulatordetector.VerdictSource
 
 internal class SensorEmulatorDetector(
     context: Context,
@@ -14,10 +15,18 @@ internal class SensorEmulatorDetector(
     private val sensorDataProcessor = SensorDataValidator()
     private val sensorEventProducer = SensorEventProducer(context, sensorType)
 
-    override fun getState(onState: (DeviceState) -> Unit) = runCatching {
+    override fun check(onCheckCompleted: (DeviceState) -> Unit) = runCatching {
         sensorEventProducer.getSensorEvents(eventsCount) {
-            val state = if (sensorDataProcessor.isEmulator(it)) DeviceState.EMULATOR else DeviceState.NOT_EMULATOR
-            onState(state)
+            val state = if (sensorDataProcessor.isEmulator(it)) {
+                DeviceState.Emulator(VerdictSource.Sensors(emptyList()))
+            } else {
+                DeviceState.NotEmulator
+            }
+            onCheckCompleted(state)
         }
-    }.getOrElse { onState(DeviceState.NOT_EMULATOR) }
+    }.getOrElse { onCheckCompleted(DeviceState.NotEmulator) }
+
+    override fun cancelCheck() {
+        TODO("Not yet implemented")
+    }
 }

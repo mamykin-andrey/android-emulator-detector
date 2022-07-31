@@ -4,33 +4,41 @@ import android.content.Context
 import android.hardware.Sensor
 import ru.mamykin.emulatordetector.internal.property.PropertiesEmulatorDetector
 import ru.mamykin.emulatordetector.internal.sensor.SensorEmulatorDetector
+import kotlin.concurrent.thread
 
 class ComplexEmulatorDetector private constructor(
     private val detectors: Collection<EmulatorDetector>,
 ) : EmulatorDetector {
 
-    override fun getState(onState: (DeviceState) -> Unit) {
-        val results = mutableListOf<DeviceState>()
-        for (detector in detectors) {
-            detector.getState {
-                if (it == DeviceState.EMULATOR) {
-                    // cancel other checks
-                    onState(it)
-                } else {
-                    results.add(it)
-                    if (results.size == detectors.size) {
-                        onState(getState(results))
-                    }
+    override fun check(onCheckCompleted: (DeviceState) -> Unit) {
+        thread {
+            val states = mutableListOf<DeviceState>()
+
+            fun onCheckInternalCompleted(state: DeviceState) {
+                states.add(state)
+                if (state is DeviceState.Emulator) {
+                    onCheckCompleted(state)
+                    cancelCheck()
+                } else if (states.size == detectors.size) {
+                    onCheckCompleted(getComplexState(states))
                 }
+            }
+
+            for (detector in detectors) {
+                detector.check { onCheckInternalCompleted(it) }
             }
         }
     }
 
-    private fun getState(states: List<DeviceState>): DeviceState {
-        return if (states.any { it == DeviceState.EMULATOR })
-            DeviceState.EMULATOR
-        else
-            DeviceState.NOT_EMULATOR
+    override fun cancelCheck() {
+        for (detector in detectors) {
+            detector.cancelCheck()
+        }
+    }
+
+    private fun getComplexState(states: List<DeviceState>): DeviceState {
+        return states.firstOrNull { it is DeviceState.Emulator }
+            ?: DeviceState.NotEmulator
     }
 
     class Builder(

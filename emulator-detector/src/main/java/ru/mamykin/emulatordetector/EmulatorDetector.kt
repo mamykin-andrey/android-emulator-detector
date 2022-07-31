@@ -1,7 +1,8 @@
 package ru.mamykin.emulatordetector
 
-// TODO: Add verdict description
 interface EmulatorDetector {
 
-    fun getState(onState: (DeviceState) -> Unit)
+    fun check(onCheckCompleted: (DeviceState) -> Unit)
+
+    fun cancelCheck()
 }

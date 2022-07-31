@@ -1,7 +1,12 @@
 package ru.mamykin.emulatordetector
 
-enum class DeviceState {
-    EMULATOR,
-    MAYBE_EMULATOR,
-    NOT_EMULATOR;
+sealed class DeviceState {
+
+    class Emulator(
+        val source: VerdictSource
+    ) : DeviceState()
+
+    object MaybeEmulator : DeviceState()
+
+    object NotEmulator : DeviceState()
 }

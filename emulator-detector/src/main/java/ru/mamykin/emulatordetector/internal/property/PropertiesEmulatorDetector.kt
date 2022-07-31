@@ -3,6 +3,7 @@ package ru.mamykin.emulatordetector.internal.property
 import android.os.Build
 import ru.mamykin.emulatordetector.DeviceState
 import ru.mamykin.emulatordetector.EmulatorDetector
+import ru.mamykin.emulatordetector.VerdictSource
 
 internal class PropertiesEmulatorDetector : EmulatorDetector {
 
@@ -17,14 +18,18 @@ internal class PropertiesEmulatorDetector : EmulatorDetector {
         ::isEmulatorProduct
     )
 
-    override fun getState(onState: (DeviceState) -> Unit) {
+    override fun check(onCheckCompleted: (DeviceState) -> Unit) {
         val buildPropsInfo = getInfo()
         val state = if (checkFunctions.any { it(buildPropsInfo) }) {
-            DeviceState.EMULATOR
+            DeviceState.Emulator(VerdictSource.Properties(emptyList()))
         } else {
-            DeviceState.NOT_EMULATOR
+            DeviceState.NotEmulator
         }
-        onState(state)
+        onCheckCompleted(state)
+    }
+
+    override fun cancelCheck() {
+        TODO("Not yet implemented")
     }
 
     private fun getInfo() = BuildPropsInfo(

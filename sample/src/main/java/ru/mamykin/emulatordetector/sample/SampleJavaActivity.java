@@ -5,6 +5,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import ru.mamykin.emulatordetector.ComplexEmulatorDetector;
 import ru.mamykin.emulatordetector.DeviceState;
@@ -23,29 +24,22 @@ public class SampleJavaActivity extends AppCompatActivity {
             .checkProperties()
             .build();
 
-        emulatorDetector.getState(deviceState -> {
+        emulatorDetector.check(deviceState -> {
             tvVerdict.setText(convertToDeviceVerdict(deviceState));
             return null;
         });
     }
 
     @NonNull
-    private String convertToDeviceVerdict(@NonNull DeviceState probability) {
-        int verdictTitle = 0;
-        switch (probability) {
-            case EMULATOR: {
-                verdictTitle = R.string.verdict_emulator;
-                break;
-            }
-            case MAYBE_EMULATOR: {
-                verdictTitle = R.string.verdict_maybe_emulator;
-                break;
-            }
-            case NOT_EMULATOR: {
-                verdictTitle = R.string.verdict_not_emulator;
-                break;
-            }
+    private String convertToDeviceVerdict(@NonNull DeviceState state) {
+        @StringRes int verdictRes;
+        if (state instanceof DeviceState.Emulator) {
+            verdictRes = R.string.verdict_emulator;
+        } else if (state instanceof DeviceState.MaybeEmulator) {
+            verdictRes = R.string.verdict_maybe_emulator;
+        } else {
+            verdictRes = R.string.verdict_not_emulator;
         }
-        return getString(verdictTitle);
+        return getString(verdictRes);
     }
 }
