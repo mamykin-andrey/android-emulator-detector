@@ -1,14 +1,15 @@
 package ru.mamykin.emulatordetector.sample;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import ru.mamykin.emulatordetector.DeviceState;
 import ru.mamykin.emulatordetector.EmulatorDetector;
+import ru.mamykin.emulatordetector.VerdictSource;
 
 public class SampleJavaActivity extends AppCompatActivity {
 
@@ -31,14 +32,30 @@ public class SampleJavaActivity extends AppCompatActivity {
 
     @NonNull
     private String convertToDeviceVerdict(@NonNull DeviceState state) {
-        @StringRes int verdictRes;
         if (state instanceof DeviceState.Emulator) {
-            verdictRes = R.string.verdict_emulator;
+            return getDeviceVerdictDescription(((DeviceState.Emulator) state).getSource());
         } else if (state instanceof DeviceState.MaybeEmulator) {
-            verdictRes = R.string.verdict_maybe_emulator;
-        } else {
-            verdictRes = R.string.verdict_not_emulator;
+            return getString(R.string.verdict_maybe_emulator);
+        } else if (state instanceof DeviceState.NotEmulator) {
+            return getString(R.string.verdict_not_emulator);
         }
-        return getString(verdictRes);
+        throw new IllegalStateException("Unknown DeviceState type: " + state + "!");
+    }
+
+    @NonNull
+    private String getDeviceVerdictDescription(@NonNull VerdictSource source) {
+        if (source instanceof VerdictSource.Properties) {
+            return getString(
+                R.string.verdict_emulator_properties,
+                TextUtils.join(", ", ((VerdictSource.Properties) source).getSuspectDeviceProperties())
+            );
+        }
+        if (source instanceof VerdictSource.Sensors) {
+            return getString(
+                R.string.verdict_emulator_sensors,
+                TextUtils.join(", ", ((VerdictSource.Sensors) source).getSuspectSensorValues())
+            );
+        }
+        throw new IllegalStateException("Unknown VerdictSource type: " + source + "!");
     }
 }

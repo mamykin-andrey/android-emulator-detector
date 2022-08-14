@@ -2,10 +2,10 @@ package ru.mamykin.emulatordetector.sample
 
 import android.os.Bundle
 import android.widget.TextView
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import ru.mamykin.emulatordetector.DeviceState
 import ru.mamykin.emulatordetector.EmulatorDetector
+import ru.mamykin.emulatordetector.VerdictSource
 
 class SampleActivity : AppCompatActivity() {
 
@@ -19,17 +19,31 @@ class SampleActivity : AppCompatActivity() {
             .checkProperties()
             .build()
 
-        emulatorDetector.check {
-            tvVerdict.text = convertToDeviceVerdict(it)
+        emulatorDetector.check { state ->
+            tvVerdict.text = getDeviceStateDescription(state)
         }
     }
 
-    private fun convertToDeviceVerdict(state: DeviceState): String {
-        @StringRes val verdictRes = when (state) {
-            is DeviceState.Emulator -> R.string.verdict_emulator
-            is DeviceState.MaybeEmulator -> R.string.verdict_maybe_emulator
-            else -> R.string.verdict_not_emulator
+    private fun getDeviceStateDescription(state: DeviceState): String {
+        return when (state) {
+            is DeviceState.Emulator -> getDeviceVerdictDescription(state.source)
+            is DeviceState.MaybeEmulator -> getString(R.string.verdict_maybe_emulator)
+            else -> getString(R.string.verdict_not_emulator)
         }
-        return getString(verdictRes)
+    }
+
+    private fun getDeviceVerdictDescription(source: VerdictSource): String = when (source) {
+        is VerdictSource.Properties -> {
+            getString(
+                R.string.verdict_emulator_properties,
+                source.suspectDeviceProperties.joinToString(", ")
+            )
+        }
+        is VerdictSource.Sensors -> {
+            getString(
+                R.string.verdict_emulator_sensors,
+                source.suspectSensorValues.joinToString(", ")
+            )
+        }
     }
 }

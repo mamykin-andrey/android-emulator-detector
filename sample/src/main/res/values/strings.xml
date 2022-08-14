@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">AndroidEmulatorDetectorSample</string>
-    <string name="verdict_progress_title">Checking...</string>
-    <string name="verdict_emulator">This device is an emulator</string>
+    <string name="verdict_progress_title">Checking…</string>
+    <string name="verdict_emulator_properties">This device is an emulator, detected by: properties detector, suspect device properties: %s</string>
+    <string name="verdict_emulator_sensors">This device is an emulator, detected by: sensors detector, suspect sensor values: %s</string>
     <string name="verdict_maybe_emulator">This device is maybe an emulator</string>
     <string name="verdict_not_emulator">This device is not an emulator</string>
 </resources>
