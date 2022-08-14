@@ -1,15 +1,10 @@
 package ru.mamykin.emulatordetector
 
-import android.content.Context
-import android.hardware.Sensor
-import ru.mamykin.emulatordetector.internal.InternalEmulatorDetector
-import ru.mamykin.emulatordetector.internal.property.PropertiesEmulatorDetector
-import ru.mamykin.emulatordetector.internal.sensor.SensorEmulatorDetector
 import kotlin.concurrent.thread
 
-class ComplexEmulatorDetector private constructor(
-    private val detectors: Collection<InternalEmulatorDetector>,
-) : InternalEmulatorDetector {
+internal class ComplexEmulatorDetector(
+    private val detectors: Collection<EmulatorDetector>,
+) : EmulatorDetector() {
 
     override fun check(onCheckCompleted: (DeviceState) -> Unit) {
         thread {
@@ -40,22 +35,5 @@ class ComplexEmulatorDetector private constructor(
     private fun getComplexState(states: List<DeviceState>): DeviceState {
         return states.firstOrNull { it is DeviceState.Emulator }
             ?: DeviceState.NotEmulator
-    }
-
-    class Builder(
-        private val context: Context,
-    ) {
-        private val emulators = mutableListOf<InternalEmulatorDetector>()
-
-        fun checkSensors() = this.apply {
-            emulators.add(SensorEmulatorDetector(context, Sensor.TYPE_ACCELEROMETER, 10, 100))
-            emulators.add(SensorEmulatorDetector(context, Sensor.TYPE_GYROSCOPE, 10, 100))
-        }
-
-        fun checkProperties() = this.apply {
-            emulators.add(PropertiesEmulatorDetector())
-        }
-
-        fun build(): InternalEmulatorDetector = ComplexEmulatorDetector(emulators)
     }
 }

@@ -7,9 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
-import ru.mamykin.emulatordetector.ComplexEmulatorDetector;
 import ru.mamykin.emulatordetector.DeviceState;
-import ru.mamykin.emulatordetector.internal.InternalEmulatorDetector;
+import ru.mamykin.emulatordetector.EmulatorDetector;
 
 public class SampleJavaActivity extends AppCompatActivity {
 
@@ -19,7 +18,7 @@ public class SampleJavaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sample);
 
         TextView tvVerdict = findViewById(R.id.tv_device_verdict);
-        InternalEmulatorDetector emulatorDetector = new ComplexEmulatorDetector.Builder(this)
+        EmulatorDetector emulatorDetector = new EmulatorDetector.Builder(this)
             .checkSensors()
             .checkProperties()
             .build();

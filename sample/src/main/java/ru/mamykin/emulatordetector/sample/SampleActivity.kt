@@ -4,9 +4,8 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
-import ru.mamykin.emulatordetector.ComplexEmulatorDetector
 import ru.mamykin.emulatordetector.DeviceState
-import ru.mamykin.emulatordetector.internal.InternalEmulatorDetector
+import ru.mamykin.emulatordetector.EmulatorDetector
 
 class SampleActivity : AppCompatActivity() {
 
@@ -15,7 +14,7 @@ class SampleActivity : AppCompatActivity() {
         setContentView(R.layout.activity_sample)
 
         val tvVerdict: TextView = findViewById(R.id.tv_device_verdict)
-        val emulatorDetector: InternalEmulatorDetector = ComplexEmulatorDetector.Builder(this)
+        val emulatorDetector: EmulatorDetector = EmulatorDetector.Builder(this)
             .checkSensors()
             .checkProperties()
             .build()

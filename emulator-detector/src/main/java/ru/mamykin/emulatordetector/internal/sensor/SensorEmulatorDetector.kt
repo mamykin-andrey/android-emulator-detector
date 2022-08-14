@@ -2,7 +2,7 @@ package ru.mamykin.emulatordetector.internal.sensor
 
 import android.content.Context
 import ru.mamykin.emulatordetector.DeviceState
-import ru.mamykin.emulatordetector.internal.InternalEmulatorDetector
+import ru.mamykin.emulatordetector.EmulatorDetector
 import ru.mamykin.emulatordetector.VerdictSource
 
 internal class SensorEmulatorDetector(
@@ -10,7 +10,7 @@ internal class SensorEmulatorDetector(
     sensorType: Int,
     private val eventsCount: Int,
     private val timeBetweenEvents: Int
-) : InternalEmulatorDetector {
+) : EmulatorDetector() {
 
     private val sensorDataProcessor = SensorDataValidator()
     private val sensorEventProducer = SensorEventProducer(context, sensorType)
