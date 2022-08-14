@@ -6,7 +6,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import ru.mamykin.emulatordetector.ComplexEmulatorDetector
 import ru.mamykin.emulatordetector.DeviceState
-import ru.mamykin.emulatordetector.EmulatorDetector
+import ru.mamykin.emulatordetector.internal.InternalEmulatorDetector
 
 class SampleActivity : AppCompatActivity() {
 
@@ -15,7 +15,7 @@ class SampleActivity : AppCompatActivity() {
         setContentView(R.layout.activity_sample)
 
         val tvVerdict: TextView = findViewById(R.id.tv_device_verdict)
-        val emulatorDetector: EmulatorDetector = ComplexEmulatorDetector.Builder(this)
+        val emulatorDetector: InternalEmulatorDetector = ComplexEmulatorDetector.Builder(this)
             .checkSensors()
             .checkProperties()
             .build()

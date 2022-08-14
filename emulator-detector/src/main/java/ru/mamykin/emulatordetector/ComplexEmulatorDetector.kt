@@ -2,13 +2,14 @@ package ru.mamykin.emulatordetector
 
 import android.content.Context
 import android.hardware.Sensor
+import ru.mamykin.emulatordetector.internal.InternalEmulatorDetector
 import ru.mamykin.emulatordetector.internal.property.PropertiesEmulatorDetector
 import ru.mamykin.emulatordetector.internal.sensor.SensorEmulatorDetector
 import kotlin.concurrent.thread
 
 class ComplexEmulatorDetector private constructor(
-    private val detectors: Collection<EmulatorDetector>,
-) : EmulatorDetector {
+    private val detectors: Collection<InternalEmulatorDetector>,
+) : InternalEmulatorDetector {
 
     override fun check(onCheckCompleted: (DeviceState) -> Unit) {
         thread {
@@ -44,7 +45,7 @@ class ComplexEmulatorDetector private constructor(
     class Builder(
         private val context: Context,
     ) {
-        private val emulators = mutableListOf<EmulatorDetector>()
+        private val emulators = mutableListOf<InternalEmulatorDetector>()
 
         fun checkSensors() = this.apply {
             emulators.add(SensorEmulatorDetector(context, Sensor.TYPE_ACCELEROMETER, 10, 100))
@@ -55,6 +56,6 @@ class ComplexEmulatorDetector private constructor(
             emulators.add(PropertiesEmulatorDetector())
         }
 
-        fun build(): EmulatorDetector = ComplexEmulatorDetector(emulators)
+        fun build(): InternalEmulatorDetector = ComplexEmulatorDetector(emulators)
     }
 }

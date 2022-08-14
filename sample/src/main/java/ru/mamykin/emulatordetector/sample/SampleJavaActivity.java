@@ -9,7 +9,7 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import ru.mamykin.emulatordetector.ComplexEmulatorDetector;
 import ru.mamykin.emulatordetector.DeviceState;
-import ru.mamykin.emulatordetector.EmulatorDetector;
+import ru.mamykin.emulatordetector.internal.InternalEmulatorDetector;
 
 public class SampleJavaActivity extends AppCompatActivity {
 
@@ -19,7 +19,7 @@ public class SampleJavaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sample);
 
         TextView tvVerdict = findViewById(R.id.tv_device_verdict);
-        EmulatorDetector emulatorDetector = new ComplexEmulatorDetector.Builder(this)
+        InternalEmulatorDetector emulatorDetector = new ComplexEmulatorDetector.Builder(this)
             .checkSensors()
             .checkProperties()
             .build();
