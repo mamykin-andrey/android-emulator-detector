@@ -20,17 +20,14 @@ internal class PropertiesEmulatorDetector : EmulatorDetector() {
         )
     }
 
-    override fun check(onCheckCompleted: (DeviceState) -> Unit) {
+    override suspend fun check(): DeviceState {
         val foundProperties = suspectProperties.filterNotNull()
-        val state = if (foundProperties.isNotEmpty()) {
+        return if (foundProperties.isNotEmpty()) {
             DeviceState.Emulator(VerdictSource.Properties(foundProperties))
         } else {
             DeviceState.NotEmulator
         }
-        onCheckCompleted(state)
     }
-
-    override fun cancelCheck() = Unit
 
     private fun getEmulatorFingerprintInfo(): Pair<String, String>? {
         val fingerprint = Build.FINGERPRINT

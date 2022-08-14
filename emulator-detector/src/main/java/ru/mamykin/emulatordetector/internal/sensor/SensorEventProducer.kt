@@ -5,28 +5,33 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import kotlinx.coroutines.CompletableDeferred
 
 internal class SensorEventProducer(
     private val context: Context,
     private val sensorType: Int
 ) {
-    @Throws(NoSuchSensorException::class)
-    fun getSensorEvents(eventsCount: Int, onEvents: (List<FloatArray>) -> Unit) {
+    suspend fun getSensorEvents(eventsCount: Int): Result<List<FloatArray>> {
         val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager?
-        val sensor = sensorManager?.getDefaultSensor(sensorType) ?: throw NoSuchSensorException()
+        val sensor = sensorManager?.getDefaultSensor(sensorType)
+            ?: return Result.failure(NoSuchSensorException())
+
         val events = mutableListOf<FloatArray>()
+        val eventsDeferred = CompletableDeferred<List<FloatArray>>()
 
         val eventListener = object : SensorEventListener {
             override fun onSensorChanged(event: SensorEvent) {
                 events.add(event.values.copyOf())
                 if (events.size == eventsCount) {
                     sensorManager.unregisterListener(this)
-                    onEvents(events)
+                    eventsDeferred.complete(events)
                 }
             }
 
             override fun onAccuracyChanged(sensor: Sensor, i: Int) = Unit
         }
         sensorManager.registerListener(eventListener, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+
+        return Result.success(eventsDeferred.await())
     }
 }

@@ -15,7 +15,7 @@ class SampleActivity : AppCompatActivity() {
 
         val tvVerdict: TextView = findViewById(R.id.tv_device_verdict)
         val emulatorDetector: EmulatorDetector = EmulatorDetector.Builder(this)
-            .checkSensors()
+//            .checkSensors()
             .checkProperties()
             .build()
 

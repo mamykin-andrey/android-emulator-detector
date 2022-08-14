@@ -7,9 +7,7 @@ import ru.mamykin.emulatordetector.internal.sensor.SensorEmulatorDetector
 
 abstract class EmulatorDetector {
 
-    abstract fun check(onCheckCompleted: (DeviceState) -> Unit)
-
-    abstract fun cancelCheck()
+    abstract suspend fun check(): DeviceState
 
     class Builder(
         private val context: Context,

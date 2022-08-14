@@ -1,39 +1,20 @@
 package ru.mamykin.emulatordetector
 
-import kotlin.concurrent.thread
+import kotlinx.coroutines.async
+import kotlinx.coroutines.supervisorScope
 
 internal class ComplexEmulatorDetector(
     private val detectors: Collection<EmulatorDetector>,
 ) : EmulatorDetector() {
 
-    override fun check(onCheckCompleted: (DeviceState) -> Unit) {
-        thread {
-            val states = mutableListOf<DeviceState>()
+    override suspend fun check(): DeviceState {
+        return supervisorScope {
+            val states = detectors
+                .map { async { it.check() } }
+                .map { it.await() }
 
-            fun onCheckInternalCompleted(state: DeviceState) {
-                states.add(state)
-                if (state is DeviceState.Emulator) {
-                    onCheckCompleted(state)
-                    cancelCheck()
-                } else if (states.size == detectors.size) {
-                    onCheckCompleted(getComplexState(states))
-                }
-            }
-
-            for (detector in detectors) {
-                detector.check { onCheckInternalCompleted(it) }
-            }
+            states.firstOrNull { it is DeviceState.Emulator }
+                ?: DeviceState.NotEmulator
         }
-    }
-
-    override fun cancelCheck() {
-        for (detector in detectors) {
-            detector.cancelCheck()
-        }
-    }
-
-    private fun getComplexState(states: List<DeviceState>): DeviceState {
-        return states.firstOrNull { it is DeviceState.Emulator }
-            ?: DeviceState.NotEmulator
     }
 }
