@@ -5,142 +5,144 @@ import ru.mamykin.emulatordetector.DeviceState
 import ru.mamykin.emulatordetector.EmulatorDetector
 import ru.mamykin.emulatordetector.VerdictSource
 
-// TODO: Add precise verdict to this detector
 internal class PropertiesEmulatorDetector : EmulatorDetector() {
 
-    private val checkFunctions = listOf(
-        ::isEmulatorFingerprint,
-        ::isEmulatorHardware,
-        ::isEmulatorBoard,
-        ::isEmulatorModel,
-        ::isEmulatorDevice,
-        ::isEmulatorBrand,
-        ::isEmulatorManufacturer,
-        ::isEmulatorProduct
-    )
+    private val suspectProperties by lazy {
+        listOf(
+            getEmulatorFingerprintInfo(),
+            getEmulatorHardwareInfo(),
+            getEmulatorBoardInfo(),
+            getEmulatorModelInfo(),
+            getEmulatorDeviceInfo(),
+            getEmulatorBrandInfo(),
+            getEmulatorManufacturerInfo(),
+            getEmulatorProductInfo(),
+        )
+    }
 
     override fun check(onCheckCompleted: (DeviceState) -> Unit) {
-        val buildPropsInfo = getInfo()
-        val state = if (checkFunctions.any { it(buildPropsInfo) }) {
-            DeviceState.Emulator(VerdictSource.Properties(emptyList()))
+        val foundProperties = suspectProperties.filterNotNull()
+        val state = if (foundProperties.isNotEmpty()) {
+            DeviceState.Emulator(VerdictSource.Properties(foundProperties))
         } else {
             DeviceState.NotEmulator
         }
         onCheckCompleted(state)
     }
 
-    override fun cancelCheck() {
-        TODO("Not yet implemented")
+    override fun cancelCheck() = Unit
+
+    private fun getEmulatorFingerprintInfo(): Pair<String, String>? {
+        val fingerprint = Build.FINGERPRINT
+        return if (
+            fingerprint.containsAny(
+                "generic/sdk/generic",
+                "generic_x86/sdk_x86/generic_x86",
+                "Andy",
+                "ttVM_Hdragon",
+                "generic_x86_64",
+                "generic/google_sdk/generic",
+                "vbox86p",
+                "generic/vbox86p/vbox86p"
+            ) || fingerprint.startsWith("unknown")
+        ) "Fingerprint" to fingerprint else null
     }
 
-    private fun getInfo() = BuildPropsInfo(
-        fingerprint = Build.FINGERPRINT,
-        hardware = Build.HARDWARE,
-        board = Build.BOARD,
-        model = Build.MODEL,
-        device = Build.DEVICE,
-        brand = Build.BRAND,
-        manufacturer = Build.MANUFACTURER,
-        product = Build.PRODUCT
-    )
-
-    private fun isEmulatorFingerprint(info: BuildPropsInfo): Boolean {
-        return listOf(
-            "generic/sdk/generic",
-            "generic_x86/sdk_x86/generic_x86",
-            "Andy",
-            "ttVM_Hdragon",
-            "generic_x86_64",
-            "generic/google_sdk/generic",
-            "vbox86p",
-            "generic/vbox86p/vbox86p"
-        ).any { info.fingerprint.contains(it) } || info.fingerprint.startsWith("unknown")
+    private fun getEmulatorHardwareInfo(): Pair<String, String>? {
+        val hardware = Build.HARDWARE
+        return if (
+            hardware.containsAny(
+                "nox",
+                "ttVM_x86",
+                "ranchu"
+            ) || hardware in listOf(
+                "goldfish",
+                "vbox86"
+            )
+        ) "Hardware" to hardware else null
     }
 
-    private fun isEmulatorHardware(info: BuildPropsInfo): Boolean {
-        return listOf(
-            "nox",
-            "ttVM_x86",
-            "ranchu"
-        ).any { info.hardware.contains(it) } || listOf(
-            "goldfish",
-            "vbox86"
-        ).any { info.hardware == it }
+    private fun getEmulatorBoardInfo(): Pair<String, String>? {
+        val board = Build.BOARD
+        return if (
+            board.contains("unknown")
+        ) "Board" to board else null
     }
 
-    private fun isEmulatorBoard(info: BuildPropsInfo): Boolean {
-        return info.board.contains("unknown")
+    private fun getEmulatorModelInfo(): Pair<String, String>? {
+        val model = Build.MODEL
+        return if (
+            model.containsAny(
+                "sdk",
+                "google_sdk",
+                "Emulator",
+                "Droid4X",
+                "TiantianVM",
+                "Andy"
+            ) || model in listOf(
+                "Android SDK built for x86_64",
+                "Android SDK built for x86"
+            )
+        ) "Model" to model else null
     }
 
-    private fun isEmulatorModel(info: BuildPropsInfo): Boolean {
-        return listOf(
-            "sdk",
-            "google_sdk",
-            "Emulator",
-            "Droid4X",
-            "TiantianVM",
-            "Andy"
-        ).any { info.model.contains(it) } || listOf(
-            "Android SDK built for x86_64",
-            "Android SDK built for x86"
-        ).any { info.model == it }
+    private fun getEmulatorDeviceInfo(): Pair<String, String>? {
+        val device = Build.DEVICE
+        return if (
+            device.containsAny(
+                "generic",
+                "generic_x86",
+                "Andy",
+                "ttVM_Hdragon",
+                "Droid4X",
+                "nox",
+                "generic_x86_64",
+                "vbox86p"
+            )
+        ) "Device" to device else null
     }
 
-    private fun isEmulatorDevice(info: BuildPropsInfo): Boolean {
-        return listOf(
-            "generic",
-            "generic_x86",
-            "Andy",
-            "ttVM_Hdragon",
-            "Droid4X",
-            "nox",
-            "generic_x86_64",
-            "vbox86p"
-        ).any { info.device.contains(it) }
+    private fun getEmulatorBrandInfo(): Pair<String, String>? {
+        val brand = Build.BRAND
+        return if (listOf(
+                "generic",
+                "generic_x86",
+                "TTVM"
+            ).any { brand == it } || brand.containsAny("Andy")
+        ) "Brand" to brand else null
     }
 
-    private fun isEmulatorBrand(info: BuildPropsInfo): Boolean {
-        return listOf(
-            "generic",
-            "generic_x86",
-            "TTVM"
-        ).any { info.brand == it } || info.brand.contains("Andy")
+    private fun getEmulatorManufacturerInfo(): Pair<String, String>? {
+        val manufacturer = Build.MANUFACTURER
+        return if (listOf(
+                "unknown",
+                "Genymotion"
+            ).any { manufacturer == it } || manufacturer.containsAny(
+                "Andy",
+                "MIT",
+                "nox",
+                "TiantianVM"
+            )
+        ) "Manufacturer" to manufacturer else null
     }
 
-    private fun isEmulatorManufacturer(info: BuildPropsInfo): Boolean {
-        return listOf(
-            "unknown",
-            "Genymotion"
-        ).any { info.manufacturer == it } || listOf(
-            "Andy",
-            "MIT",
-            "nox",
-            "TiantianVM"
-        ).any { info.manufacturer.contains(it) }
+    private fun getEmulatorProductInfo(): Pair<String, String>? {
+        val product = Build.PRODUCT
+        return if (product.containsAny(
+                "sdk",
+                "Andy",
+                "ttVM_Hdragon",
+                "google_sdk",
+                "Droid4X",
+                "nox",
+                "sdk_x86",
+                "sdk_google",
+                "vbox86p"
+            )
+        ) "Product" to product else null
     }
 
-    private fun isEmulatorProduct(info: BuildPropsInfo): Boolean {
-        return listOf(
-            "sdk",
-            "Andy",
-            "ttVM_Hdragon",
-            "google_sdk",
-            "Droid4X",
-            "nox",
-            "sdk_x86",
-            "sdk_google",
-            "vbox86p"
-        ).any { info.product.contains(it) }
+    private fun String.containsAny(vararg parts: String): Boolean {
+        return parts.any { this.contains(it) }
     }
-
-    data class BuildPropsInfo(
-        val fingerprint: String,
-        val hardware: String,
-        val board: String,
-        val model: String,
-        val device: String,
-        val brand: String,
-        val manufacturer: String,
-        val product: String
-    )
 }
