@@ -4,10 +4,12 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import junit.framework.Assert.assertTrue
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class ComplexEmulatorDetectorTest {
 
     @Test
@@ -30,27 +32,22 @@ internal class ComplexEmulatorDetectorTest {
         assertTrue(state is DeviceState.Emulator)
     }
 
-    @Test(timeout = 600)
+    @Test
     fun `check launches checks in parallel`() = runTest {
-        val firstMockEmulator = mockk<EmulatorDetector>().apply {
-            coEvery { check() } coAnswers {
-                delay(500)
-                DeviceState.NotEmulator
+        assertVirtualTime(600) {
+            val delayDetector = mockk<EmulatorDetector>().apply {
+                coEvery { check() } coAnswers {
+                    delay(500)
+                    DeviceState.NotEmulator
+                }
             }
-        }
-        val secondMockEmulator = mockk<EmulatorDetector>().apply {
-            coEvery { check() } coAnswers {
-                delay(500)
-                DeviceState.NotEmulator
+            val detector = ComplexEmulatorDetector(listOf(delayDetector, delayDetector))
+
+            detector.check()
+
+            coVerify(exactly = 2) {
+                delayDetector.check()
             }
-        }
-        val detector = ComplexEmulatorDetector(listOf(firstMockEmulator, secondMockEmulator))
-
-        detector.check()
-
-        coVerify {
-            firstMockEmulator.check()
-            secondMockEmulator.check()
         }
     }
 }
