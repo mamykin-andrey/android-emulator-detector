@@ -3,6 +3,8 @@ package ru.mamykin.emulatordetector.sample
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import ru.mamykin.emulatordetector.DeviceState
 import ru.mamykin.emulatordetector.EmulatorDetector
 import ru.mamykin.emulatordetector.VerdictSource
@@ -15,35 +17,33 @@ class SampleActivity : AppCompatActivity() {
 
         val tvVerdict: TextView = findViewById(R.id.tv_device_verdict)
         val emulatorDetector: EmulatorDetector = EmulatorDetector.Builder(this)
-//            .checkSensors()
+            .checkSensors()
             .checkProperties()
             .build()
 
-        emulatorDetector.getState { state ->
+        lifecycleScope.launch {
+            val state = emulatorDetector.getState()
             tvVerdict.text = getDeviceStateDescription(state)
         }
     }
 
     private fun getDeviceStateDescription(state: DeviceState): String {
-        return when (state) {
-            is DeviceState.Emulator -> getDeviceVerdictDescription(state.source)
-            is DeviceState.MaybeEmulator -> getString(R.string.verdict_maybe_emulator)
-            else -> getString(R.string.verdict_not_emulator)
+        return if (state is DeviceState.Emulator) {
+            getDeviceVerdictDescription(state.source)
+        } else {
+            getString(R.string.verdict_not_emulator)
         }
     }
 
-    private fun getDeviceVerdictDescription(source: VerdictSource): String = when (source) {
-        is VerdictSource.Properties -> {
-            getString(
-                R.string.verdict_emulator_properties,
-                source.suspectDeviceProperties.joinToString(", ")
-            )
+    private fun getDeviceVerdictDescription(source: VerdictSource): String {
+        val (descriptionId, data) = when (source) {
+            is VerdictSource.Properties -> {
+                R.string.verdict_emulator_properties to source.suspectDeviceProperties.joinToString(", ")
+            }
+            is VerdictSource.Sensors -> {
+                R.string.verdict_emulator_sensors to source.suspectSensorValues.joinToString(", ")
+            }
         }
-        is VerdictSource.Sensors -> {
-            getString(
-                R.string.verdict_emulator_sensors,
-                source.suspectSensorValues.joinToString(", ")
-            )
-        }
+        return getString(descriptionId, data)
     }
 }

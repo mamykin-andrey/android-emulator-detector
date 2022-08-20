@@ -6,7 +6,5 @@ sealed class DeviceState {
         val source: VerdictSource
     ) : DeviceState()
 
-    object MaybeEmulator : DeviceState()
-
     object NotEmulator : DeviceState()
 }
