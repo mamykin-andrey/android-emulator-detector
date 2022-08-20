@@ -19,7 +19,7 @@ class SampleActivity : AppCompatActivity() {
             .checkProperties()
             .build()
 
-        emulatorDetector.check { state ->
+        emulatorDetector.getState { state ->
             tvVerdict.text = getDeviceStateDescription(state)
         }
     }

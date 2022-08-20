@@ -7,10 +7,10 @@ internal class ComplexEmulatorDetector(
     private val detectors: Collection<EmulatorDetector>,
 ) : EmulatorDetector() {
 
-    override suspend fun check(): DeviceState {
+    override suspend fun getState(): DeviceState {
         return supervisorScope {
             val states = detectors
-                .map { async { it.check() } }
+                .map { async { it.getState() } }
                 .map { it.await() }
 
             states.firstOrNull { it is DeviceState.Emulator }

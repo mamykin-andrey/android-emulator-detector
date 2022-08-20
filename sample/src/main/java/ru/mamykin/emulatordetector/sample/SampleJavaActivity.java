@@ -24,7 +24,7 @@ public class SampleJavaActivity extends AppCompatActivity {
             .checkProperties()
             .build();
 
-        emulatorDetector.check(deviceState -> {
+        emulatorDetector.getState(deviceState -> {
             tvVerdict.setText(convertToDeviceVerdict(deviceState));
             return null;
         });

@@ -7,8 +7,19 @@ import ru.mamykin.emulatordetector.VerdictSource
 
 internal class PropertiesEmulatorDetector : EmulatorDetector() {
 
+    companion object {
+        private const val TITLE_FINGERPRINT = "Fingerprint"
+        private const val TITLE_HARDWARE = "Hardware"
+        private const val TITLE_BOARD = "Board"
+        private const val TITLE_MODEL = "Model"
+        private const val TITLE_DEVICE = "Device"
+        private const val TITLE_BRAND = "Brand"
+        private const val TITLE_MANUFACTURER = "Manufacturer"
+        private const val TITLE_PRODUCT = "Product"
+    }
+
     private val suspectProperties by lazy {
-        listOf(
+        listOfNotNull(
             getEmulatorFingerprintInfo(),
             getEmulatorHardwareInfo(),
             getEmulatorBoardInfo(),
@@ -20,10 +31,9 @@ internal class PropertiesEmulatorDetector : EmulatorDetector() {
         )
     }
 
-    override suspend fun check(): DeviceState {
-        val foundProperties = suspectProperties.filterNotNull()
-        return if (foundProperties.isNotEmpty()) {
-            DeviceState.Emulator(VerdictSource.Properties(foundProperties))
+    override suspend fun getState(): DeviceState {
+        return if (suspectProperties.isNotEmpty()) {
+            DeviceState.Emulator(VerdictSource.Properties(suspectProperties))
         } else {
             DeviceState.NotEmulator
         }
@@ -42,7 +52,7 @@ internal class PropertiesEmulatorDetector : EmulatorDetector() {
                 "vbox86p",
                 "generic/vbox86p/vbox86p"
             ) || fingerprint.startsWith("unknown")
-        ) "Fingerprint" to fingerprint else null
+        ) TITLE_FINGERPRINT to fingerprint else null
     }
 
     private fun getEmulatorHardwareInfo(): Pair<String, String>? {
@@ -56,14 +66,14 @@ internal class PropertiesEmulatorDetector : EmulatorDetector() {
                 "goldfish",
                 "vbox86"
             )
-        ) "Hardware" to hardware else null
+        ) TITLE_HARDWARE to hardware else null
     }
 
     private fun getEmulatorBoardInfo(): Pair<String, String>? {
         val board = Build.BOARD
         return if (
             board.contains("unknown")
-        ) "Board" to board else null
+        ) TITLE_BOARD to board else null
     }
 
     private fun getEmulatorModelInfo(): Pair<String, String>? {
@@ -80,7 +90,7 @@ internal class PropertiesEmulatorDetector : EmulatorDetector() {
                 "Android SDK built for x86_64",
                 "Android SDK built for x86"
             )
-        ) "Model" to model else null
+        ) TITLE_MODEL to model else null
     }
 
     private fun getEmulatorDeviceInfo(): Pair<String, String>? {
@@ -96,7 +106,7 @@ internal class PropertiesEmulatorDetector : EmulatorDetector() {
                 "generic_x86_64",
                 "vbox86p"
             )
-        ) "Device" to device else null
+        ) TITLE_DEVICE to device else null
     }
 
     private fun getEmulatorBrandInfo(): Pair<String, String>? {
@@ -106,7 +116,7 @@ internal class PropertiesEmulatorDetector : EmulatorDetector() {
                 "generic_x86",
                 "TTVM"
             ).any { brand == it } || brand.containsAny("Andy")
-        ) "Brand" to brand else null
+        ) TITLE_BRAND to brand else null
     }
 
     private fun getEmulatorManufacturerInfo(): Pair<String, String>? {
@@ -120,7 +130,7 @@ internal class PropertiesEmulatorDetector : EmulatorDetector() {
                 "nox",
                 "TiantianVM"
             )
-        ) "Manufacturer" to manufacturer else null
+        ) TITLE_MANUFACTURER to manufacturer else null
     }
 
     private fun getEmulatorProductInfo(): Pair<String, String>? {
@@ -136,7 +146,7 @@ internal class PropertiesEmulatorDetector : EmulatorDetector() {
                 "sdk_google",
                 "vbox86p"
             )
-        ) "Product" to product else null
+        ) TITLE_PRODUCT to product else null
     }
 
     private fun String.containsAny(vararg parts: String): Boolean {

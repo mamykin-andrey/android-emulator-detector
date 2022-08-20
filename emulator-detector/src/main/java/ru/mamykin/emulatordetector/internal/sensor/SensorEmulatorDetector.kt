@@ -8,14 +8,13 @@ import ru.mamykin.emulatordetector.VerdictSource
 internal class SensorEmulatorDetector(
     context: Context,
     sensorType: Int,
-    private val eventsCount: Int,
-    private val timeBetweenEvents: Int
+    private val eventsCount: Int
 ) : EmulatorDetector() {
 
     private val sensorDataProcessor = SensorDataValidator()
     private val sensorEventProducer = SensorEventProducer(context, sensorType)
 
-    override suspend fun check(): DeviceState {
+    override suspend fun getState(): DeviceState {
         val sensorEvents = sensorEventProducer.getSensorEvents(eventsCount)
             .onFailure { return DeviceState.NotEmulator }
             .getOrThrow()

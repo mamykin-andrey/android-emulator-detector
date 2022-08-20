@@ -16,7 +16,7 @@ internal class ComplexEmulatorDetectorTest {
     fun `check returns not emulator when detectors are empty`() = runTest {
         val detector = ComplexEmulatorDetector(emptyList())
 
-        val state = detector.check()
+        val state = detector.getState()
 
         assertTrue(state is DeviceState.NotEmulator)
     }
@@ -24,10 +24,10 @@ internal class ComplexEmulatorDetectorTest {
     @Test
     fun `check returns emulator when detector returns emulator`() = runTest {
         val detector = ComplexEmulatorDetector(listOf(mockk<EmulatorDetector>().apply {
-            coEvery { check() } returns DeviceState.Emulator(VerdictSource.Properties(emptyList()))
+            coEvery { getState() } returns DeviceState.Emulator(VerdictSource.Properties(emptyList()))
         }))
 
-        val state = detector.check()
+        val state = detector.getState()
 
         assertTrue(state is DeviceState.Emulator)
     }
@@ -36,17 +36,17 @@ internal class ComplexEmulatorDetectorTest {
     fun `check launches checks in parallel`() = runTest {
         assertVirtualTime(600) {
             val delayDetector = mockk<EmulatorDetector>().apply {
-                coEvery { check() } coAnswers {
+                coEvery { getState() } coAnswers {
                     delay(500)
                     DeviceState.NotEmulator
                 }
             }
             val detector = ComplexEmulatorDetector(listOf(delayDetector, delayDetector))
 
-            detector.check()
+            detector.getState()
 
             coVerify(exactly = 2) {
-                delayDetector.check()
+                delayDetector.getState()
             }
         }
     }
